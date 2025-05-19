@@ -14,6 +14,7 @@ TRAIN_RATIO = 0.6
 VAL_RATIO = 0.2
 TEST_RATIO = 0.2
 MOVING_AVG_WINDOW = 20
+MOVING_AVG_MODE = 'same' #'same', 'full'
 CLIP_START = 1000
 CLIP_END = 91000
 
@@ -27,7 +28,7 @@ def preprocess_dataset(filepath):
     # Apply moving average filter and remove DC offset for each column
     processed_cols = []
     for col in FEATURE_COLUMNS:
-        filtered = moving_average_filter(df_clipped[col], MOVING_AVG_WINDOW)
+        filtered = moving_average_filter(df_clipped[col], MOVING_AVG_WINDOW, MOVING_AVG_MODE)
         filtered = filtered.dropna().reset_index(drop=True)
         dc_corrected = remove_dc_offset(filtered)
         processed_cols.append(dc_corrected)

@@ -7,14 +7,20 @@ from data_processing import load_and_prepare_data, moving_average_filter, remove
 FEATURE_COLUMNS = ['i_u', 'i_v', 'i_w', 'a_x', 'a_y', 'a_z']
 SEGMENT_LENGTH = 256
 MOVING_AVG_WINDOW = 20
+MOVING_AVG_MODE = 'same' #'same', 'full'
 TOTAL_SEGMENTS = 100
 
 def preprocess_segment(segment_df):
     processed_cols = []
     for col in FEATURE_COLUMNS:
-        filtered = moving_average_filter(segment_df[col], MOVING_AVG_WINDOW)
+        filtered = moving_average_filter(segment_df[col], MOVING_AVG_WINDOW, MOVING_AVG_MODE)
         filtered = filtered.dropna().reset_index(drop=True)
         dc_corrected = remove_dc_offset(filtered)
+        # Ensure length matches SEGMENT_LENGTH if mode is not 'same'
+        if MOVING_AVG_MODE != 'same':
+            if len(dc_corrected) > SEGMENT_LENGTH:
+                # Truncate to SEGMENT_LENGTH
+                dc_corrected = dc_corrected.iloc[:SEGMENT_LENGTH]
         processed_cols.append(dc_corrected)
     processed_df = pd.concat(processed_cols, axis=1)
     processed_df.columns = FEATURE_COLUMNS
@@ -29,7 +35,8 @@ def get_random_segment(df):
 def main():
     # Load datasets
     df_normal = load_and_prepare_data('without_load_10_5_2025.csv', FEATURE_COLUMNS)
-    df_faulty = load_and_prepare_data('with_load_10_5_2025.csv', FEATURE_COLUMNS)
+    # df_faulty = load_and_prepare_data('with_load_10_5_2025.csv', FEATURE_COLUMNS)
+    df_faulty = load_and_prepare_data('with_new_load_19_5_2025.csv', FEATURE_COLUMNS)
     if df_normal is None or df_faulty is None:
         print("Error loading data files.")
         return

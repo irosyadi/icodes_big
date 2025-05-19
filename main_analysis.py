@@ -6,7 +6,8 @@ import motor_stft_analysis
 
 def main():
     # File paths
-    file_unbalanced = 'with_load_10_5_2025.csv'
+    # file_unbalanced = 'with_load_10_5_2025.csv'
+    file_unbalanced = 'with_new_load_19_5_2025.csv'
     file_normal = 'without_load_10_5_2025.csv'
 
     # Image output folder
